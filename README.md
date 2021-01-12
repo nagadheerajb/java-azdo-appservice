@@ -1,14 +1,14 @@
 # Java on Azure Devops 
-This repository presents an example of a java project on azure devops by highlighting the build, automated tests and deployment aspects.
-Within an azure devops pipeline, the application booksService is deployed to 2 different environement Dev & QA Azure app services with automated tests for each step
+This repository demonstrates a Java microservice project deployed on Azure DevOps, highlighting CI/CD pipeline stages, automated testing, and infrastructure provisioning. The application, "BooksService," features RESTful APIs for adding and retrieving books, and is deployed to Azure App Services for two environments: Dev and QA.
+The CI/CD pipeline integrates Maven builds, unit testing, acceptance tests, and deployment with approval gates for QA. It also includes advanced capabilities such as Newman payload testing, JMeter-based load testing with Azure Load Testing, and code analysis using Microsoft Defender for DevOps. Infrastructure is provisioned using Bicep templates for automated deployment.
 ## Prerequisites
   - Azure Subscription
   - Azure Devops Organisation
-  - [Azure resource Manager service connextion](https://azuredevopslabs.com/labs/devopsserver/azureserviceprincipal)
+  - [Azure resource Manager service connection](https://azuredevopslabs.com/labs/devopsserver/azureserviceprincipal)
 
 ## The Java Microservice:
   - Books service with 2 endpoints:
-    - POST : `/books/Add`
+    - POST : `/books/add`
       - body :
     
         ```json
@@ -16,7 +16,7 @@ Within an azure devops pipeline, the application booksService is deployed to 2 d
          'author': 'string' }
         ```
     - GET: `/books/{id}`
-      - id (path parametter) : `Long`
+      - id (path parameter) : `Long`
   - JDK Version : 11
   - Spring boot version : 2.7.4
   
@@ -30,17 +30,17 @@ The CI/CD pipeline contains 3 stages : <br>
   - Stage Build 
     - maven build
     - publishing azure artifacts (.jar) to pipeline staging directory
-    - Code Analysis with #Microsoft Defender for Devops 
-  - Deploy TO Dev
+    - Code Analysis using #Microsoft Defender for Devops 
+  - Deploy to Dev
     - Deploy to dev app service
     - Run newman test
-  - Deploy TO QA
-    - Asquing for environement Approval
+  - Deploy to QA
+    - Asking for environment Approval
     - Deploying to Qa app service
     - Run Azure load testing
   
 ### Requiring an approval to deploy to QA
- - To require an approval you need a pipeline environement, here are the steps to do so:
+ - To require an approval you need a pipeline environment, here are the steps to do so:
    - Create an empty environment, [see example](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/environments?view=azure-devops)
     - In the more options menu, choose approvals and checks <br>
   
@@ -50,7 +50,7 @@ The CI/CD pipeline contains 3 stages : <br>
   
       ![create new approval](img/createNewApproval.png)<br>
 
-   - Include the environement in the desired stage 
+   - Include the environment in the desired stage 
  - 
       ```yaml
       - stage: QA
@@ -95,7 +95,7 @@ The jUnit test are run during the maven package task
   ![Test Results](img/acceptanceTest.png)     
   
 ### Payload Tests : newMan 
-- The neman collection is located in newman/booksTest.postman_collection, newman tests are run in the build stage withe the task CmdLine@2 which executes the newman run command in  a commandLine script :
+- The Newman collection is located in newman/booksTest.postman_collection, newman tests are run in the build stage withe the task CmdLine@2 which executes the newman run command in  a commandLine script :
 
   ```yaml
       - task: CmdLine@2
@@ -110,14 +110,14 @@ The jUnit test are run during the maven package task
   
   ![newmanRun](img/newmanRun.png)
 
-- If you want to publish newman reports to Azure Devops there many opensource extentions to visualise the html reports, so be selective ;)  
+- If you want to publish newman reports to Azure Devops there many opensource extensions to visualise the html reports, so be selective ;)  
 
 ### Load Testing : Azure Load Test
 - The Load testing is done within Azure LoadTesting Task, which uses Jmeter Load testing, the Jmeter files are located under /jmeter folder, the contains 2 files:
   -  jmeter.yaml :  contains the configuration for the load test and the failure criteria
   -  jmeterTest.xml : contains the load test scenario, the number of request per second, test duration ..
-- The Load testing  is run in the QA whith AzureLoadTest@1, this task has 2 requirements :
-  -  The [azure load testing extention](https://marketplace.visualstudio.com/items?itemName=AzloadTest.AzloadTesting) to be installed in your azure devops organisation
+- The Load testing  is run in the QA with AzureLoadTest@1, this task has 2 requirements :
+  -  The [azure load testing extention](https://marketplace.visualstudio.com/items?itemName=AzloadTest.AzloadTesting) to be installed in your Azure DevOps organisation
   -  An azure load test resource which can be created via azure portal<br>
   
   ![create azure load test resource](img/azure-portal-create-load-test.png)<br> 
@@ -143,7 +143,7 @@ The jUnit test are run during the maven package task
   ![Load Test Res 2](img/load-test-results-2.png)  <br>
 
 ### Code Analysis 
-- Code anlysis is done through MicrosoftSecurityDevOps@1, this task requires [Microsoft Security DevOps for Azure DevOps
+- Code analysis is done through MicrosoftSecurityDevOps@1, this task requires [Microsoft Security DevOps for Azure DevOps
 ](https://marketplace.visualstudio.com/items?itemName=ms-securitydevops.microsoft-security-devops-azdevops) to be installed. the task is added to the build stage as following :
 
      ```yaml
